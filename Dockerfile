@@ -6,7 +6,8 @@ FROM node:22-bookworm-slim
 # Node slim image doesn't ship. Remotion's renderer also shells out to
 # ffmpeg for the final encode. ffmpeg isn't part of Playwright's own
 # dependency list, so it's installed separately here.
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
