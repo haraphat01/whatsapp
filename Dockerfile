@@ -21,9 +21,9 @@ RUN npm ci
 
 COPY . .
 
-# Downloads Playwright's own Chromium build into the image (separate from
-# whatever Remotion downloads for itself).
-RUN npx playwright install chromium
+# Playwright 1.63 launches Chromium's headless shell for screenshots. Install
+# both artifacts because the regular browser package does not include it.
+RUN npx playwright install chromium chromium-headless-shell
 
 RUN npm run build
 
