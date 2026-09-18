@@ -33,9 +33,17 @@ export async function POST(req: Request) {
     // Lazy import: keeps Playwright (a devDependency-sized native browser
     // binary) out of the route's cold-start path unless actually invoked.
     const { chromium } = await import("playwright");
-    // Docker containers commonly run as root with no user namespace, under
-    // which Chromium's setuid sandbox refuses to start.
-    const browser = await chromium.launch({ args: ["--no-sandbox", "--disable-setuid-sandbox"] });
+    const browser = await chromium.launch({
+      // Docker containers commonly run as root with no user namespace,
+      // under which Chromium's setuid sandbox refuses to start.
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // Pin to the full browser downloaded by `playwright install chromium`.
+      // Without this, Playwright launches the separate chrome-headless-shell
+      // binary for a plain headless launch, which can end up missing even
+      // when the install step reports success (see chromium-headless-shell
+      // install in the Dockerfile — this is belt-and-suspenders on top of it).
+      channel: "chromium",
+    });
     try {
       const { width, height } = dimensionsFor(exportSettings.resolution, exportSettings.aspectRatio);
       // Cap viewport size (real device pixel ratios cover the "4K" case)
