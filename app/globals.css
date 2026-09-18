@@ -22,5 +22,41 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes chatframe-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+
+@keyframes chatframe-tick-pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* The chat UI intentionally does NOT inherit the marketing site's Geist
+   font. Real WhatsApp renders with the OS's native UI font, so ChatWindow
+   opts into the system-font stack here to read as authentic chat text
+   rather than a branded/designed typeface. */
+.chatframe-native-font {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+.chatframe-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.chatframe-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
