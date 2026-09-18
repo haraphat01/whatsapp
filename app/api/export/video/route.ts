@@ -60,7 +60,12 @@ export async function POST(req: Request) {
     const { selectComposition, renderMedia } = await import("@remotion/renderer");
     const serveUrl = await getBundle();
 
-    const composition = await selectComposition({ serveUrl, id: "ChatVideo", inputProps });
+    // Docker containers commonly run as root with no user namespace, under
+    // which Chromium's setuid sandbox refuses to start; "angle" is the more
+    // reliable GL backend when there's no real GPU available.
+    const chromiumOptions = { disableWebSecurity: true, gl: "angle" as const, headless: true };
+
+    const composition = await selectComposition({ serveUrl, id: "ChatVideo", inputProps, chromiumOptions });
 
     await renderMedia({
       composition,
@@ -68,6 +73,7 @@ export async function POST(req: Request) {
       codec: exportSettings.format === "mp4" ? "h264" : "vp8",
       outputLocation: outputPath,
       inputProps,
+      chromiumOptions,
     });
 
     const buffer = await fs.readFile(outputPath);
