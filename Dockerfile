@@ -4,14 +4,9 @@ FROM node:22-bookworm-slim
 # headless Chromium at runtime. Neither is a pure-JS dependency — Chromium
 # needs these shared libraries present in the OS image, which a minimal
 # Node slim image doesn't ship. Remotion's renderer also shells out to
-# ffmpeg for the final encode.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates wget fonts-liberation \
-    libasound2 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcairo2 \
-    libcups2 libdbus-1-3 libdrm2 libexpat1 libgbm1 libglib2.0-0 \
-    libnspr4 libnss3 libpango-1.0-0 libx11-6 libxcb1 libxcomposite1 \
-    libxdamage1 libxext6 libxfixes3 libxkbcommon0 libxrandr2 \
-    xdg-utils ffmpeg \
+# ffmpeg for the final encode. ffmpeg isn't part of Playwright's own
+# dependency list, so it's installed separately here.
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -21,9 +16,13 @@ RUN npm ci
 
 COPY . .
 
-# Playwright 1.63 launches Chromium's headless shell for screenshots. Install
-# both artifacts because the regular browser package does not include it.
-RUN npx playwright install chromium chromium-headless-shell
+# Playwright 1.63 launches Chromium's headless shell for screenshots, so both
+# artifacts are installed — the regular browser package alone does not
+# include it. --with-deps lets Playwright install the exact OS packages its
+# specific Chromium build needs for the container's actual architecture,
+# rather than a hand-picked list that turned out to be incomplete on x64
+# (missing libglib-2.0.so.0) despite working on arm64.
+RUN npx playwright install --with-deps chromium chromium-headless-shell
 
 RUN npm run build
 
