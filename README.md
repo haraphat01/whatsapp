@@ -60,6 +60,8 @@ cp .env.example .env.local
 | `DEEPSEEK_MODEL` | no | Defaults to `deepseek-chat` |
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | no | Reserved for a future Supabase migration; unused today |
 | `NEXT_PUBLIC_APP_URL` | no | Only needed in production behind a proxy that doesn't set `x-forwarded-host` |
+| `RENDER_BASE_URL` | no | Internal URL used by screenshot rendering; defaults to `http://127.0.0.1:3000` in Docker |
+| `RENDER_CONCURRENCY` | no | Remotion render concurrency; defaults to `1` for small production containers |
 
 AI generation requires **one** of `OPENAI_API_KEY` or `DEEPSEEK_API_KEY`. Everything else
 (editor, playback, screenshot export, video export, projects, demo content) works with no keys at

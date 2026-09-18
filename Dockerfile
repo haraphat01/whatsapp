@@ -29,6 +29,9 @@ RUN npm run build
 
 ENV NODE_ENV=production
 ENV PORT=3000
+# Server-side screenshot rendering should call the app directly instead of
+# hairpinning through Coolify's public reverse proxy.
+ENV RENDER_BASE_URL=http://127.0.0.1:3000
 EXPOSE 3000
 
 CMD ["npm", "start"]

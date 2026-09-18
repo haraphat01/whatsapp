@@ -1,17 +1,9 @@
 import { NextResponse } from "next/server";
 import { exportPayloadSchema, dimensionsFor } from "@/lib/rendering/exportPayload";
+import { renderOrigin } from "@/lib/rendering/origin";
 import { writeRenderPayload, deleteRenderPayload } from "@/lib/rendering/tempStore";
 
 export const maxDuration = 60;
-
-function originFromRequest(req: Request): string {
-  const url = new URL(req.url);
-  const forwardedHost = req.headers.get("x-forwarded-host");
-  const forwardedProto = req.headers.get("x-forwarded-proto");
-  const host = forwardedHost ?? url.host;
-  const protocol = forwardedProto ?? url.protocol.replace(":", "");
-  return `${protocol}://${host}`;
-}
 
 export async function POST(req: Request) {
   let body: unknown;
@@ -51,8 +43,8 @@ export async function POST(req: Request) {
       const deviceScaleFactor = Math.min(4, Math.max(1, width / viewport.width));
 
       const page = await browser.newPage({ viewport, deviceScaleFactor });
-      const origin = originFromRequest(req);
-      await page.goto(`${origin}/render/${renderId}`, { waitUntil: "networkidle" });
+      const origin = renderOrigin(req);
+      await page.goto(`${origin}/render/${renderId}`, { waitUntil: "domcontentloaded" });
       await page.waitForSelector("#render-ready", { state: "attached", timeout: 15_000 });
 
       const isFull = exportSettings.screenshotMode === "full";

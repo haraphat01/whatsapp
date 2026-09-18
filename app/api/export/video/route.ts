@@ -74,6 +74,9 @@ export async function POST(req: Request) {
       outputLocation: outputPath,
       inputProps,
       chromiumOptions,
+      // Keep the default compatible with small Coolify containers. Increase
+      // RENDER_CONCURRENCY when the deployment has more memory available.
+      concurrency: Number(process.env.RENDER_CONCURRENCY ?? 1),
     });
 
     const buffer = await fs.readFile(outputPath);
