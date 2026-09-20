@@ -52,6 +52,8 @@ export function MessageBubble({
   const outgoing = sender.isMe;
   const radius = theme.bubbleRadius ?? RADIUS_PRESETS[theme.bubbleStyle];
   const status = statusOverride ?? message.status;
+  const timestampHidden = theme.timestampStyle === "hidden";
+  const timestampColor = dark ? "rgba(255,255,255,0.55)" : outgoing ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.4)";
 
   if (message.type === "system") {
     return (
@@ -103,7 +105,7 @@ export function MessageBubble({
 
       <div
         className={cn(
-          "relative max-w-[72%] cursor-pointer px-2.5 py-1.5 transition-shadow",
+          "relative flow-root max-w-[72%] cursor-pointer px-2.5 py-1.5 transition-shadow",
           selected && "ring-2 ring-offset-1 ring-blue-500"
         )}
         style={{ background: bubbleBg, color: textColor, fontSize: theme.fontSize, ...cornerStyle }}
@@ -123,7 +125,16 @@ export function MessageBubble({
         )}
 
         {message.type === "voice" && (
-          <VoiceNote durationSec={message.durationSec} waveform={message.waveform} outgoing={outgoing} accentColor={sender.accentColor} />
+          <VoiceNote
+            durationSec={message.durationSec}
+            waveform={message.waveform}
+            outgoing={outgoing}
+            accentColor={sender.accentColor}
+            timeLabel={formatTimestamp(message.timestamp, timeFormat)}
+            status={status}
+            timestampHidden={timestampHidden}
+            timestampColor={timestampColor}
+          />
         )}
 
         {message.type === "call" && (
@@ -135,16 +146,18 @@ export function MessageBubble({
           <p className="mt-0.5 whitespace-pre-wrap break-words leading-snug tracking-[0.01em]">{message.caption}</p>
         )}
 
-        <span
-          className={cn(
-            "float-right ml-2 mt-1 flex items-center gap-1 select-none text-[10.5px] leading-none",
-            theme.timestampStyle === "hidden" && "opacity-0"
-          )}
-          style={{ color: dark ? "rgba(255,255,255,0.55)" : outgoing ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.4)" }}
-        >
-          {formatTimestamp(message.timestamp, timeFormat)}
-          {outgoing && <StatusTicks status={status} />}
-        </span>
+        {message.type !== "voice" && (
+          <span
+            className={cn(
+              "float-right ml-2 mt-1 flex items-center gap-1 select-none text-[10.5px] leading-none",
+              timestampHidden && "opacity-0"
+            )}
+            style={{ color: timestampColor }}
+          >
+            {formatTimestamp(message.timestamp, timeFormat)}
+            {outgoing && <StatusTicks status={status} />}
+          </span>
+        )}
 
         {showReaction && <ReactionBadge reactions={message.reactions} outgoing={outgoing} />}
         {showTail && <BubbleTail outgoing={outgoing} color={bubbleBg} />}

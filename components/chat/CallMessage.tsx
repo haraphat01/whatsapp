@@ -2,10 +2,13 @@ import { Phone, PhoneMissed, Video, VideoOff } from "lucide-react";
 import { CallStatus, CallType } from "@/lib/validation/schemas";
 import { cn } from "@/lib/utils";
 
-function formatDuration(totalSeconds: number): string {
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = Math.floor(totalSeconds % 60);
-  return `${mins}:${String(secs).padStart(2, "0")}`;
+export function formatCallDuration(totalSeconds: number): string {
+  const totalMins = Math.max(1, Math.round(totalSeconds / 60));
+  const hrs = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  if (hrs === 0) return `${mins} min`;
+  if (mins === 0) return `${hrs} hr`;
+  return `${hrs} hr ${mins} min`;
 }
 
 export function CallMessage({
@@ -36,7 +39,7 @@ export function CallMessage({
           {missed ? `Missed ${label.toLowerCase()}` : label}
         </p>
         {!missed && durationSec != null && (
-          <p className="text-[11.5px] leading-tight opacity-60">{formatDuration(durationSec)}</p>
+          <p className="text-[11.5px] leading-tight opacity-60">{formatCallDuration(durationSec)}</p>
         )}
       </div>
     </div>
