@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { canUse, recordUsage, getUsage } from "@/lib/usage/usage";
 import { toast } from "@/stores/useToastStore";
+import { captureViewportAnchor } from "@/lib/rendering/viewportAnchor";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -34,6 +35,9 @@ export function ExportPanel() {
       toast({ title: "Monthly screenshot limit reached", description: "Upgrade your plan for more exports.", variant: "destructive" });
       return;
     }
+    const preview = document.getElementById("editor-preview");
+    const viewport =
+      exportSettings.screenshotMode === "viewport" && preview ? captureViewportAnchor(preview) ?? undefined : undefined;
     setExporting("screenshot");
     try {
       const res = await fetch("/api/export/screenshot", {
@@ -43,6 +47,7 @@ export function ExportPanel() {
           conversation: project.conversation,
           theme: project.theme,
           exportSettings: { ...exportSettings, format },
+          viewport,
         }),
       });
       if (!res.ok) {
@@ -190,6 +195,11 @@ export function ExportPanel() {
           <option value="viewport">Visible viewport</option>
           <option value="full">Full conversation</option>
         </Select>
+        {exportSettings.screenshotMode === "viewport" && (
+          <p className="mt-1.5 text-[11px] text-zinc-400">
+            Scroll the preview to the part you want — the screenshot captures exactly what&apos;s shown there.
+          </p>
+        )}
       </div>
 
       <div className="space-y-2 border-t border-zinc-200 pt-4">

@@ -16,6 +16,15 @@ import { ThemeEditor } from "@/components/editor/ThemeEditor";
 import { TimingEditor } from "@/components/editor/TimingEditor";
 import { ExportPanel } from "@/components/editor/ExportPanel";
 import { MessageEditor } from "@/components/editor/MessageEditor";
+import { cn } from "@/lib/utils";
+
+// The preview matches the export aspect ratio so a "visible viewport"
+// screenshot captures exactly the frame shown here.
+const PREVIEW_SIZE = {
+  "9:16": "h-[604px] w-[340px]",
+  "1:1": "h-[440px] w-[440px]",
+  "16:9": "h-[315px] w-[560px]",
+} as const;
 
 export default function EditorPage() {
   const params = useParams<{ id: string }>();
@@ -107,7 +116,7 @@ export default function EditorPage() {
         </aside>
 
         <main className="flex items-center justify-center overflow-y-auto bg-zinc-100 p-6">
-          <div className="h-[680px] w-[340px] flex-shrink-0">
+          <div id="editor-preview" className={cn("flex-shrink-0", PREVIEW_SIZE[project.exportSettings.aspectRatio])}>
             <ChatWindow
               conversation={project.conversation}
               theme={project.theme}

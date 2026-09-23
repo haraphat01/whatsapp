@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { exportPayloadSchema, dimensionsFor } from "@/lib/rendering/exportPayload";
 import { renderOrigin } from "@/lib/rendering/origin";
 import { writeRenderPayload, deleteRenderPayload } from "@/lib/rendering/tempStore";
+import { MESSAGE_SELECTOR, SCROLL_CONTAINER_SELECTOR } from "@/lib/rendering/viewportAnchor";
 
 export const maxDuration = 60;
 
@@ -45,17 +46,54 @@ export async function POST(req: Request) {
       channel: "chromium",
     });
     try {
+      const isFull = exportSettings.screenshotMode === "full";
+      const anchor = isFull ? undefined : parsed.data.viewport;
+
       const { width, height } = dimensionsFor(exportSettings.resolution, exportSettings.aspectRatio);
-      // Cap viewport size (real device pixel ratios cover the "4K" case)
-      const viewport = { width: Math.min(width, 900), height: Math.min(height, 1600) };
-      const deviceScaleFactor = Math.min(4, Math.max(1, width / viewport.width));
+      // A viewport screenshot lays out at the editor preview's exact CSS size so
+      // text wrapping and framing match what the user saw; resolution comes
+      // from the device pixel ratio instead of a larger layout.
+      const viewport = anchor
+        ? { width: anchor.width, height: anchor.height }
+        : // Cap viewport size (real device pixel ratios cover the "4K" case)
+          { width: Math.min(width, 900), height: Math.min(height, 1600) };
+      const deviceScaleFactor = Math.min(8, Math.max(1, width / viewport.width));
 
       const page = await browser.newPage({ viewport, deviceScaleFactor });
       const origin = renderOrigin(req);
       await page.goto(`${origin}/render/${renderId}`, { waitUntil: "domcontentloaded" });
-      await page.waitForSelector("#render-ready", { state: "attached", timeout: 15_000 });
+      await page.waitForSelector("#render-ready[data-ready]", { state: "attached", timeout: 15_000 });
 
-      const isFull = exportSettings.screenshotMode === "full";
+      if (anchor) {
+        // Let fonts and images settle first so they can't shift layout after
+        // the scroll position is restored.
+        await page.evaluate(async () => {
+          await document.fonts.ready;
+          await Promise.all(
+            Array.from(document.images)
+              .filter((img) => !img.complete)
+              .map((img) => new Promise((resolve) => { img.onload = img.onerror = resolve; }))
+          );
+        });
+        await page.evaluate(
+          ({ anchor, containerSelector, messageSelector }) => {
+            const container = document.querySelector<HTMLElement>(containerSelector);
+            if (!container) return;
+            if (anchor.atBottom || !anchor.messageId) {
+              container.scrollTop = container.scrollHeight;
+              return;
+            }
+            const target = Array.from(container.querySelectorAll<HTMLElement>(messageSelector)).find(
+              (el) => el.dataset.messageId === anchor.messageId
+            );
+            if (!target) return;
+            const delta = target.getBoundingClientRect().top - container.getBoundingClientRect().top;
+            container.scrollTop += delta - anchor.offset;
+          },
+          { anchor, containerSelector: SCROLL_CONTAINER_SELECTOR, messageSelector: MESSAGE_SELECTOR }
+        );
+      }
+
       const buffer = isFull
         ? await page.screenshot({
             fullPage: true,

@@ -5,6 +5,7 @@ import {
   playbackSettingsSchema,
   themeSchema,
 } from "@/lib/validation/schemas";
+import { viewportAnchorSchema } from "./viewportAnchor";
 
 /** Payload shared by the screenshot and video export endpoints. */
 export const exportPayloadSchema = z.object({
@@ -13,6 +14,8 @@ export const exportPayloadSchema = z.object({
   exportSettings: exportSettingsSchema,
   /** For screenshots: only render messages up to (and including) this id. Omit for the full conversation. */
   upToMessageId: z.string().optional(),
+  /** For "viewport" screenshots: the editor preview's exact size and scroll position. */
+  viewport: viewportAnchorSchema.optional(),
 });
 export type ExportPayload = z.infer<typeof exportPayloadSchema>;
 

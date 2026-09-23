@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { readRenderPayload } from "@/lib/rendering/tempStore";
 import { exportPayloadSchema } from "@/lib/rendering/exportPayload";
 import { ChatWindow } from "@/components/chat/ChatWindow";
+import { RenderReady } from "./RenderReady";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export default async function RenderPage({
         scrollBehavior="instant"
         fullConversation={fullConversation}
       />
-      <div id="render-ready" data-ready="true" style={{ display: "none" }} />
+      <RenderReady />
     </div>
   );
 }

@@ -2,9 +2,12 @@ import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  // Index by code point, not UTF-16 unit, so an emoji in the name (e.g.
+  // "Family 🏠") isn't split into a lone surrogate. Server and browser
+  // serialize a lone surrogate differently, which breaks hydration.
+  const parts = name.trim().split(/\s+/).map((part) => Array.from(part));
+  if (parts.length === 1) return parts[0].slice(0, 2).join("").toUpperCase();
+  return ((parts[0][0] ?? "") + (parts[parts.length - 1][0] ?? "")).toUpperCase();
 }
 
 export function Avatar({

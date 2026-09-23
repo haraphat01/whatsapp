@@ -76,6 +76,7 @@ export function MessageList({
   return (
     <div
       ref={containerRef}
+      data-chatframe-scroll
       className={`chatframe-scrollbar flex-1 overflow-x-hidden overflow-y-auto py-2 ${className ?? ""}`}
       style={wallpaperStyle(theme)}
     >
@@ -102,7 +103,7 @@ export function MessageList({
         const repliedSender = repliedMessage ? participantsById.get(repliedMessage.senderId) : undefined;
 
         return (
-          <div key={message.id}>
+          <div key={message.id} data-message-id={message.id}>
             {separators.has(message.id) && <DateSeparator label={separators.get(message.id)!} dark={theme.mode === "dark"} />}
             {unreadBeforeMessageId === message.id && <UnreadDivider dark={theme.mode === "dark"} />}
             <MessageBubble
