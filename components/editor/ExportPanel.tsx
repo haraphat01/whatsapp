@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { canUse, recordUsage, getUsage } from "@/lib/usage/usage";
 import { toast } from "@/stores/useToastStore";
 import { captureViewportAnchor } from "@/lib/rendering/viewportAnchor";
+import { resolveStatusBar } from "@/lib/statusBar";
+import { Input } from "@/components/ui/input";
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -46,7 +48,7 @@ export function ExportPanel() {
         body: JSON.stringify({
           conversation: project.conversation,
           theme: project.theme,
-          exportSettings: { ...exportSettings, format },
+          exportSettings: { ...(await resolveStatusBar(exportSettings, project.conversation.timeFormat)), format },
           viewport,
         }),
       });
@@ -80,7 +82,7 @@ export function ExportPanel() {
           conversation: project.conversation,
           theme: project.theme,
           playbackSettings: project.playbackSettings,
-          exportSettings: { ...exportSettings, format },
+          exportSettings: { ...(await resolveStatusBar(exportSettings, project.conversation.timeFormat)), format },
         }),
       });
       if (!res.ok) {
@@ -118,6 +120,38 @@ export function ExportPanel() {
         Show status bar
         <Switch checked={exportSettings.showStatusBar} onCheckedChange={(v) => setExportSettings({ showStatusBar: v })} />
       </label>
+
+      {exportSettings.showStatusBar && (
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">Status bar time</Label>
+            <Input
+              className="mt-1.5 h-8 text-xs"
+              placeholder="Current time"
+              value={exportSettings.statusBarTime}
+              onChange={(e) => setExportSettings({ statusBarTime: e.target.value.trim() })}
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Battery %</Label>
+            <Input
+              className="mt-1.5 h-8 text-xs"
+              type="number"
+              min={0}
+              max={100}
+              placeholder="Device level"
+              value={exportSettings.statusBarBattery ?? ""}
+              onChange={(e) =>
+                setExportSettings({
+                  statusBarBattery:
+                    e.target.value === "" ? null : Math.min(100, Math.max(0, Math.round(Number(e.target.value)))),
+                })
+              }
+            />
+          </div>
+          <p className="col-span-2 text-[11px] text-zinc-400">Leave blank to use the current time and your device&apos;s battery.</p>
+        </div>
+      )}
 
       <div>
         <Label className="text-xs">Simulation label</Label>

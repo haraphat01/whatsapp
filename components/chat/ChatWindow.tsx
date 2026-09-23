@@ -66,7 +66,7 @@ export function ChatWindow({
         dark ? "bg-[#0b141a]" : "bg-[#e5ddd5]"
       )}
     >
-      {exportSettings?.showStatusBar && <DeviceStatusBar settings={exportSettings} dark={showDeviceFrame} />}
+      {exportSettings?.showStatusBar && <DeviceStatusBar settings={exportSettings} timeFormat={conversation.timeFormat} dark={showDeviceFrame} />}
       <ChatHeader conversation={conversation} theme={theme} typingLabel={typingLabel} />
       <MessageList
         conversation={conversation}

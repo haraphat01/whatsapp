@@ -261,8 +261,9 @@ export const exportSettingsSchema = z.object({
   // who specifically want a marketing-style "phone in hand" graphic.
   deviceFrame: deviceFrameSchema.default("none"),
   showStatusBar: z.boolean().default(true),
-  statusBarTime: z.string().default("9:41"),
-  statusBarBattery: z.number().min(0).max(100).default(85),
+  // Empty = current time, null = device battery level (see lib/statusBar.ts).
+  statusBarTime: z.string().default(""),
+  statusBarBattery: z.number().min(0).max(100).nullable().default(null),
   showSignal: z.boolean().default(true),
   showWifi: z.boolean().default(true),
   simulationLabel: simulationLabelPositionSchema.default("hidden"),

@@ -64,7 +64,7 @@ export function ChatVideo({ conversation, theme, playbackSettings, exportSetting
 
   const body = (
     <AbsoluteFill className={dark ? "bg-[#0b141a]" : "bg-[#e5ddd5]"} style={{ display: "flex", flexDirection: "column" }}>
-      {exportSettings.showStatusBar && <DeviceStatusBar settings={exportSettings} dark={exportSettings.deviceFrame !== "none"} />}
+      {exportSettings.showStatusBar && <DeviceStatusBar settings={exportSettings} timeFormat={conversation.timeFormat} dark={exportSettings.deviceFrame !== "none"} />}
       <ChatHeader conversation={conversation} theme={theme} typingLabel={typingParticipant ? "typing..." : null} />
       <MessageList
         conversation={conversation}

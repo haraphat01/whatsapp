@@ -95,10 +95,18 @@ export function getProject(id: string): Project | null {
     const raw = window.localStorage.getItem(PROJECT_KEY(id));
     if (!raw) return null;
     const parsed = projectSchema.safeParse(JSON.parse(raw));
-    return parsed.success ? parsed.data : null;
+    return parsed.success ? migrateStatusBar(parsed.data) : null;
   } catch {
     return null;
   }
+}
+
+// Projects saved before the status bar went automatic stored the old
+// hard-coded "9:41" / 85% defaults, which had no UI to change them.
+function migrateStatusBar(project: Project): Project {
+  const { statusBarTime, statusBarBattery } = project.exportSettings;
+  if (statusBarTime !== "9:41" || statusBarBattery !== 85) return project;
+  return { ...project, exportSettings: { ...project.exportSettings, statusBarTime: "", statusBarBattery: null } };
 }
 
 export function saveProject(project: Project): Project {
