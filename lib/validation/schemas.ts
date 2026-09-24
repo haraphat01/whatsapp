@@ -172,7 +172,7 @@ export const systemMessageSchema = z.object({
 export const callTypeSchema = z.enum(["voice", "video"]);
 export type CallType = z.infer<typeof callTypeSchema>;
 
-export const callStatusSchema = z.enum(["missed", "received"]);
+export const callStatusSchema = z.enum(["missed", "received", "outgoing"]);
 export type CallStatus = z.infer<typeof callStatusSchema>;
 
 export const callMessageSchema = z.object({
@@ -180,7 +180,7 @@ export const callMessageSchema = z.object({
   type: z.literal("call"),
   callType: callTypeSchema,
   callStatus: callStatusSchema,
-  /** Only meaningful when callStatus is "received". */
+  /** Only meaningful for answered calls ("received" or "outgoing"). */
   durationSec: z.number().optional(),
 });
 

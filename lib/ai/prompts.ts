@@ -67,7 +67,7 @@ function buildContextBlock(req: GenerationRequest): string {
       : `This conversation happens in a single session on ${req.startDate}. Leave "daysAfterPrevious" at 0 (or omit it) for every message.`;
 
   const callsLine = req.includeCalls
-    ? `Include a few realistic phone/video call log entries where they fit the scenario, using type "call" with "callType" ("voice" or "video"), "callStatus" ("missed" or "received"), and "callDurationSec" when received. A call's "sender" is whoever placed it.`
+    ? `Include a few realistic phone/video call log entries where they fit the scenario, using type "call" with "callType" ("voice" or "video"), "callStatus" ("missed", "received" or "outgoing"), and "callDurationSec" when received or outgoing. A call's "sender" is whoever placed it.`
     : `Do not include any "call" type messages.`;
 
   return `Conversation type: ${req.conversationType}${req.isGroup ? ` (group chat${req.groupName ? ` named "${req.groupName}"` : ""})` : " (one-on-one)"}

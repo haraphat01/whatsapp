@@ -122,7 +122,7 @@ export function DateTimeStep() {
       <label className="flex items-center justify-between rounded-xl border border-zinc-200 p-3.5">
         <div>
           <p className="text-sm font-medium text-zinc-900">Include simulated calls</p>
-          <p className="text-xs text-zinc-500 mt-0.5">Occasionally add missed and received voice/video call log entries where they fit.</p>
+          <p className="text-xs text-zinc-500 mt-0.5">Occasionally add missed, received and outgoing voice/video call log entries where they fit.</p>
         </div>
         <Switch checked={includeCalls} onCheckedChange={setIncludeCalls} />
       </label>

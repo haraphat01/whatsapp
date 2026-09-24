@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useProjectEditorStore } from "@/stores/useProjectEditorStore";
-import { Message, MessageStatus, MessageType } from "@/lib/validation/schemas";
+import { CallStatus, Message, MessageStatus, MessageType } from "@/lib/validation/schemas";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -216,13 +216,14 @@ export function MessageEditor() {
             <Select
               className="mt-1.5"
               value={message.callStatus}
-              onChange={(e) => store.updateMessage(message.id, { callStatus: e.target.value as "missed" | "received" })}
+              onChange={(e) => store.updateMessage(message.id, { callStatus: e.target.value as CallStatus })}
             >
               <option value="received">Received</option>
+              <option value="outgoing">Outgoing</option>
               <option value="missed">Missed</option>
             </Select>
           </div>
-          {message.callStatus === "received" && (
+          {message.callStatus !== "missed" && (
             <div>
               <Label className="text-xs">Duration (seconds)</Label>
               <Input

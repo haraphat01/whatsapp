@@ -40,13 +40,13 @@ export const aiMessageSchema = z.object({
     .transform((v) => v ?? undefined)
     .describe("Required for type 'call': whether it was a voice or video call"),
   callStatus: z
-    .enum(["missed", "received"])
+    .enum(["missed", "received", "outgoing"])
     .nullable()
     .optional()
     .transform((v) => v ?? undefined)
-    .describe("Required for type 'call': whether the call was missed or received/answered"),
+    .describe("Required for type 'call': whether the call was missed, received (answered incoming call) or outgoing (answered call the sender placed)"),
   callDurationSec: nullableNumber(z.number()).describe(
-    "For type 'call' with status 'received': how long the call lasted"
+    "For type 'call' with status 'received' or 'outgoing': how long the call lasted"
   ),
   replyToIndex: nullableNumber(z.number().int()).describe(
     "Zero-based index of an earlier message this replies to"
@@ -93,7 +93,7 @@ export const aiConversationJsonSchema = {
             documentName: { type: ["string", "null"] },
             voiceDurationSec: { type: ["number", "null"] },
             callType: { type: ["string", "null"], enum: ["voice", "video", null] },
-            callStatus: { type: ["string", "null"], enum: ["missed", "received", null] },
+            callStatus: { type: ["string", "null"], enum: ["missed", "received", "outgoing", null] },
             callDurationSec: { type: ["number", "null"] },
             replyToIndex: { type: ["integer", "null"] },
             reactionEmoji: { type: ["string", "null"] },
