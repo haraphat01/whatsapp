@@ -72,7 +72,7 @@ export function CallMessage({
         <CallIcon callType={callType} direction={direction} className="h-3.5 w-3.5" />
       </span>
       <div className="min-w-0">
-        <p className={cn("text-[13.5px] leading-tight", missed && "text-red-500")}>
+        <p className="text-[13.5px] leading-tight">
           {missed ? `Missed ${label.toLowerCase()}` : label}
         </p>
         {missed ? (
