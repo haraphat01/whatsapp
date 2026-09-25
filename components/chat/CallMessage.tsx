@@ -72,11 +72,11 @@ export function CallMessage({
         <CallIcon callType={callType} direction={direction} className="h-3.5 w-3.5" />
       </span>
       <div className="min-w-0">
-        <p className="text-[13.5px] leading-tight">
+        <p className={cn("text-[13.5px] leading-tight", missed && "font-semibold")}>
           {missed ? `Missed ${label.toLowerCase()}` : label}
         </p>
         {missed ? (
-          <p className="text-[11.5px] leading-tight opacity-60">Tap to call back</p>
+          <p className="text-[11.5px] leading-tight">Tap to call back</p>
         ) : (
           durationSec != null && (
             <p className="text-[11.5px] leading-tight opacity-60">{formatCallDuration(durationSec)}</p>
