@@ -75,8 +75,12 @@ export function CallMessage({
         <p className={cn("text-[13.5px] leading-tight", missed && "text-red-500")}>
           {missed ? `Missed ${label.toLowerCase()}` : label}
         </p>
-        {!missed && durationSec != null && (
-          <p className="text-[11.5px] leading-tight opacity-60">{formatCallDuration(durationSec)}</p>
+        {missed ? (
+          <p className="text-[11.5px] leading-tight opacity-60">Tap to call back</p>
+        ) : (
+          durationSec != null && (
+            <p className="text-[11.5px] leading-tight opacity-60">{formatCallDuration(durationSec)}</p>
+          )
         )}
       </div>
     </div>

@@ -1,24 +1,27 @@
-function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+/** Whole calendar days between two dates' local midnights (positive when `a` is before `b`). */
+function calendarDaysBetween(a: Date, b: Date): number {
+  const startA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const startB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((startB - startA) / 86_400_000);
 }
 
+/** Mirrors WhatsApp: "Today", "Yesterday", the weekday within the past week,
+ * otherwise "September 30, 2025". */
 export function dateSeparatorLabel(iso: string, now: Date = new Date()): string {
   const date = new Date(iso);
-  const today = now;
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
+  const daysAgo = calendarDaysBetween(date, now);
 
-  if (isSameDay(date, today)) return "TODAY";
-  if (isSameDay(date, yesterday)) return "YESTERDAY";
+  if (daysAgo === 0) return "Today";
+  if (daysAgo === 1) return "Yesterday";
+  if (daysAgo > 1 && daysAgo < 7) return WEEKDAYS[date.getDay()];
 
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
+  return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
 /** Returns the ids of messages that should have a date separator rendered
